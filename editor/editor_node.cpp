@@ -952,6 +952,15 @@ void EditorNode::_fs_changed() {
 				export_error = "This project doesn't have an `export_presets.cfg` file at its root.\nCreate an export preset from the \"Project > Export\" dialog and try again.";
 			}
 		} else {
+			if(!export_defer.android_template_path.is_empty()){
+				// Install android template if specified
+				if(export_defer.android_template_path == "default") {
+					const String templates_dir = EditorSettings::get_singleton()->get_export_templates_dir().plus_file(VERSION_FULL_CONFIG);
+					export_template_manager->install_android_template_from_file(templates_dir.plus_file("android_source.zip"));
+				} else {
+					export_template_manager->install_android_template_from_file(export_defer.android_template_path);			
+				}	
+			}
 			Ref<EditorExportPlatform> platform = export_preset->get_platform();
 			const String export_path = export_defer.path.is_empty() ? export_preset->get_export_path() : export_defer.path;
 			if (export_path.is_empty()) {
@@ -4272,11 +4281,12 @@ void EditorNode::_editor_file_dialog_unregister(EditorFileDialog *p_dialog) {
 
 Vector<EditorNodeInitCallback> EditorNode::_init_callbacks;
 
-Error EditorNode::export_preset(const String &p_preset, const String &p_path, bool p_debug, bool p_pack_only) {
+Error EditorNode::export_preset(const String &p_preset, const String &p_path, bool p_debug, bool p_pack_only, const String &p_android_template_path) {
 	export_defer.preset = p_preset;
 	export_defer.path = p_path;
 	export_defer.debug = p_debug;
 	export_defer.pack_only = p_pack_only;
+	export_defer.android_template_path = p_android_template_path;
 	cmdline_export_mode = true;
 	return OK;
 }

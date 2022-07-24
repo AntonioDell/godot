@@ -378,6 +378,8 @@ void Main::print_help(const char *p_binary) {
 	OS::get_singleton()->print("                                               <path> should be absolute or relative to the project directory, and include the filename for the binary (e.g. 'builds/game.exe'). The target directory should exist.\n");
 	OS::get_singleton()->print("  --export-debug <preset> <path>               Same as --export, but using the debug template.\n");
 	OS::get_singleton()->print("  --export-pack <preset> <path>                Same as --export, but only export the game pack for the given preset. The <path> extension determines whether it will be in PCK or ZIP format.\n");
+	OS::get_singleton()->print("  --install-android-template <path>            Install the android template from the given <path> prior to exporting the android project.\n");
+	OS::get_singleton()->print("                                               <path> is optional and defaults to the path used by the \"Install Android Build Template\" menu button.\n");
 	OS::get_singleton()->print("  --convert-3to4                               Converts project from Godot 3.x to Godot 4.x.\n");
 	OS::get_singleton()->print("  --validate-conversion-3to4                   Shows what elements will be renamed when converting project from Godot 3.x to Godot 4.x.\n");
 	OS::get_singleton()->print("  --doctool [<path>]                           Dump the engine API reference to the given <path> (defaults to current dir) in XML format, merging if existing files are found.\n");
@@ -2113,6 +2115,7 @@ bool Main::start() {
 	String doc_tool_path;
 	bool doc_base = true;
 	String _export_preset;
+	String _android_template_path;
 	bool export_debug = false;
 	bool export_pack_only = false;
 	bool converting_project = false;
@@ -2182,6 +2185,13 @@ bool Main::start() {
 				editor = true;
 				_export_preset = args[i + 1];
 				export_pack_only = true;
+			}
+			else if (args[i] == "--install-android-template") {
+				_android_template_path = args[i + 1];
+				if(_android_template_path.is_empty() || _android_template_path.begins_with("-")){
+					// Assuming other command line arg, or no path given -> use default template dir
+					_android_template_path = "default";
+				}
 #endif
 			} else {
 				// The parameter does not match anything known, don't skip the next argument
@@ -2490,7 +2500,7 @@ bool Main::start() {
 			sml->get_root()->add_child(editor_node);
 
 			if (!_export_preset.is_empty()) {
-				editor_node->export_preset(_export_preset, positional_arg, export_debug, export_pack_only);
+				editor_node->export_preset(_export_preset, positional_arg, export_debug, export_pack_only, _android_template_path);
 				game_path = ""; // Do not load anything.
 			}
 		}

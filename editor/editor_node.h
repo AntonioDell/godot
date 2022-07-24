@@ -246,6 +246,7 @@ private:
 		String path;
 		bool debug = false;
 		bool pack_only = false;
+		String android_template_path;
 	} export_defer;
 
 	static EditorNode *singleton;
@@ -812,7 +813,7 @@ public:
 
 	void _copy_warning(const String &p_str);
 
-	Error export_preset(const String &p_preset, const String &p_path, bool p_debug, bool p_pack_only);
+	Error export_preset(const String &p_preset, const String &p_path, bool p_debug, bool p_pack_only, const String &p_android_template_path);
 
 	Control *get_gui_base() { return gui_base; }
 	Control *get_theme_base() { return gui_base->get_parent_control(); }
